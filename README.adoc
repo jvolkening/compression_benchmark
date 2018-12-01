@@ -1,0 +1,49 @@
+= Optimal compression scheme to balance ratio and decompression speed
+Jeremy Volkening
+:source-highlighter: pygments
+
+[abstract]
+.Abstract
+Some resources spent most of their time in storage but also require quick access when needed.
+For these resources, compression speed is of little importance, as they are write-once-read-often objects.
+We tested a number of popular compression tools to look for one which provided fast decompression with reasonable file sizes.
+
+The follow results were derived using eight cores of a 64-core, 512GB RAM Xeon-based server.
+
+//[%header,cols="8*^,<,<",format=tsv]
+//|===
+//include::meta/runs.tsv[]
+//|===
+
+== Compression ratio
+
+
+.Ratio of uncompressed to compressed file size
+image::figure/fig_ratios-1.png[Ratio of uncompressed to compressed file size,align=center]
+
+
+== Decompression speed
+
+
+.Elapsed walltime when decompressing to /dev/null, as a ratio to the fastest time
+image::figure/fig_to_null-1.png[Elapsed walltime when decompressing to /dev/null, as a ratio to the fastest time,align=center]
+
+
+
+.Elapsed walltime when decompressing to disk, as a ratio to the fastest time
+image::figure/fig_to_disk-1.png[Elapsed walltime when decompressing to disk, as a ratio to the fastest time,align=center]
+
+
+== Memory usage
+
+
+.Maximum memory utililized (MB)
+image::figure/fig_mem-1.png[Maximum memory utililized (MB),align=center]
+
+
+== CPU usage
+
+
+.Average CPU utilization (%)
+image::figure/fig_cpu-1.png[Average CPU utilization (%),align=center]
+
