@@ -61,10 +61,9 @@ my $cmds = {
 };
 
 say join "\t", qw/
+    file
     config
-    c_time_disk
     c_time_mem
-    d_time_disk
     d_time_mem
     ratio
     c_mem
@@ -77,36 +76,28 @@ for my $conf (keys %$cmds) {
 
     say STDERR "Running $conf";
 
-    my $tmp_out_disk = File::Temp->new(DIR => '/tmp');
-    my $tmp_out_mem  = File::Temp->new(DIR => '/dev/shm');
-    my $tmp_out_dec  = File::Temp->new(DIR => '/tmp');
+    my $tmp_out_mem  = File::Temp->new(DIR => '/dev/shm', UNLINK => 1);
+    my $tmp_out_dec  = File::Temp->new(DIR => '/tmp', UNLINK => 1);
 
     my $time_bin = `which time`;
     chomp $time_bin;
     my $time = "$time_bin -f \"%E\\t%M\\t%P\"";
     
-    my $comp_cmd_disk = "$time $cmds->{$conf} -q -k -c $fn_in 2>&1 1> $tmp_out_disk";
     my $comp_cmd_mem  = "$time $cmds->{$conf} -q -k -c $fn_in_mem 2>&1 1> $tmp_out_mem";
 
-    my $decomp_cmd_disk = "$time $cmds->{$conf} -q -d -c $tmp_out_disk 2>&1 1> $tmp_out_dec";
     my $decomp_cmd_mem  = "$time $cmds->{$conf} -q -d -c $tmp_out_mem 2>&1 1> /dev/null";
 
     say STDERR "\t1";
-    my @cdisk = run( $comp_cmd_disk );
-    say STDERR "\t2";
     my @cmem  = run( $comp_cmd_mem );
-    say STDERR "\t3";
-    my @ddisk = run( $decomp_cmd_disk );
-    say STDERR "\t4";
+    say STDERR "\t2";
     my @dmem  = run( $decomp_cmd_mem );
 
     say join "\t",
+        basename($fn_in),
         $conf,
-        $cdisk[0],
         $cmem[0],
-        $ddisk[0],
         $dmem[0],
-        (-s $tmp_out_disk)/(-s $fn_in),
+        (-s $tmp_out_mem)/(-s $fn_in),
         $cmem[1],
         $dmem[1],
         $cmem[2],
@@ -114,6 +105,8 @@ for my $conf (keys %$cmds) {
     ;
 
 } 
+
+unlink $fn_in_mem;
 
 sub run {
 
