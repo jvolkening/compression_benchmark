@@ -1,0 +1,54 @@
+= Optimal compression scheme to balance ratio and decompression speed
+Jeremy Volkening
+:source-highlighter: pygments
+
+[abstract]
+.Abstract
+Some resources spent most of their time in storage but also require quick access when needed.
+For these resources, compression speed is of little importance, as they are write-once-read-often objects.
+We tested a number of popular compression tools to look for one which provided fast decompression with reasonable file sizes.
+
+== Methods
+
+Three input files were used for testing, each truncated to ~ 2GB in size:
+
+f1.input:: A file of randomly chosen English words
+
+f2.input:: The *Mus musculus* genome
+
+f3.input:: A prebuilt https://ccb.jhu.edu/software/centrifuge/[Centrifuge] index file
+
+Tests were run using AWS Batch, with one or four threads per process.
+For all programs, default parameters were used except for compression level and threads, which were set as indicated below.
+
+=== Software versions
+
+[%header,cols="2*^",format=tsv]
+|===
+include::versions.tsv[]
+|===
+
+== Results
+
+
+=== Compression ratio
+
++r knit_child('fig/ratios.Radoc')+
+
+=== (De)compression speed
+
++r knit_child('fig/ctime.Radoc')+
+
++r knit_child('fig/dtime.Radoc')+
+
+=== Memory usage
+
++r knit_child('fig/cmem.Radoc')+
+
++r knit_child('fig/dmem.Radoc')+
+
+=== CPU usage
+
++r knit_child('fig/ccpu.Radoc')+
+
++r knit_child('fig/dcpu.Radoc')+

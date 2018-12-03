@@ -8,13 +8,17 @@ use File::Basename qw/basename/;
 use File::Copy qw/copy/;
 use File::Temp;
 
-my $fn_in = $ARGV[0];
-
-my $threads = $ARGV[1] // 8;
+my $fn_in   = $ARGV[0];
+my $dir_tmp = $ARGV[1] // '/tmp';
+my $threads = $ARGV[2] // 8;
 
 # read file once into RAM-based storage
-my $fn_in_mem = "/dev/shm/" . basename($fn_in);
+# currently AWS Batch docker /dev/shm too small,
+# so either need to create separate tmpfs or just read/write to disk
+my $fn_in_mem = join '/', $dir_tmp, basename($fn_in);
 copy $fn_in, $fn_in_mem;
+#system("cat $fn_in > /dev/null");
+#my $fn_in_mem = $fn_in;
 
 my $cmds = {
 
@@ -58,6 +62,14 @@ my $cmds = {
     "lbzip2_l9_t$threads" => "lbzip2 -n $threads -9",
     "lbzip2_l1_t$threads" => "lbzip2 -n $threads -1",
 
+    # xz, single thread
+    "xz_l9_t1" => "xz -T 1 -9",
+    "xz_l1_t1" => "xz -T 1 -1",
+
+    # xz, multi thread
+    "xz_l9_t$threads" => "xz -T $threads -9",
+    "xz_l1_t$threads" => "xz -T $threads -1",
+
 };
 
 say join "\t", qw/
@@ -76,8 +88,7 @@ for my $conf (keys %$cmds) {
 
     say STDERR "Running $conf";
 
-    my $tmp_out_mem  = File::Temp->new(DIR => '/dev/shm', UNLINK => 1);
-    my $tmp_out_dec  = File::Temp->new(DIR => '/tmp', UNLINK => 1);
+    my $tmp_out_mem  = File::Temp->new(DIR => $dir_tmp, UNLINK => 1);
 
     my $time_bin = `which time`;
     chomp $time_bin;

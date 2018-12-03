@@ -14,15 +14,14 @@ url_words = 'https://raw.githubusercontent.com/dwyl/english-words/master/words.t
 url_genome = 'ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/vertebrate_mammalian/Mus_musculus/all_assembly_versions/GCF_000001635.26_GRCm38.p6/GCF_000001635.26_GRCm38.p6_genomic.fna.gz'
 
 environment  = Channel.fromPath("${baseDir}/environment.yml")
+docker_tmpfs = '/tmp/scratch'
+environment.into {environment_vers;environment_tests}
 
 
 process collect_data {
 
-    cpus 1
-    memory '2 GB'
-
     output:
-    file "*.input" into test_files mode flatten
+    file '*.input' into test_files mode flatten
 
     """
     # word list to generate random input
@@ -39,24 +38,49 @@ process collect_data {
 
 }
 
-process run_tests {
+process get_versions {
 
     tag "$input"
-    echo true
-    cpus "${params.threads}"
-    memory '4 GB'
+
+    publishDir ".", mode: 'copy',
+        pattern: "*.tsv"
 
     input:
-    each file(input) from test_files
-    file env from environment
+    file env from environment_vers
 
     output:
-    file "${input.baseName}.res.tsv" into res_files
+    file "versions.tsv"
 
     """
     conda env create -n compression -f $env
     source activate compression
-    bm.pl $input ${params.threads} > ${input.baseName}.res.tsv
+
+    versions.pl > versions.tsv
+    """
+
+}
+
+process run_tests {
+
+    tag "$input"
+    cpus "${params.threads}"
+    memory '8 GB'
+
+    input:
+    each file(input) from test_files
+    file env from environment_tests
+
+    output:
+    file "${input.baseName}.res.tmp" into res_files
+
+    """
+    mkdir -p $docker_tmpfs
+    mount -t tmpfs -o size=6g tmpfs $docker_tmpfs
+
+    conda env create -n compression -f $env
+    source activate compression
+
+    bm.pl $input $docker_tmpfs ${params.threads} > ${input.baseName}.res.tmp
     """
 
 }

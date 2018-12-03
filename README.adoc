@@ -8,42 +8,68 @@ Some resources spent most of their time in storage but also require quick access
 For these resources, compression speed is of little importance, as they are write-once-read-often objects.
 We tested a number of popular compression tools to look for one which provided fast decompression with reasonable file sizes.
 
-The follow results were derived using eight cores of a 64-core, 512GB RAM Xeon-based server.
+== Methods
 
-//[%header,cols="8*^,<,<",format=tsv]
-//|===
-//include::meta/runs.tsv[]
-//|===
+Three input files were used for testing, each truncated to ~ 2GB in size:
 
-== Compression ratio
+f1.input:: A file of randomly chosen English words
 
+f2.input:: The *Mus musculus* genome
 
-.Ratio of uncompressed to compressed file size
-image::figure/fig_ratios-1.png[Ratio of uncompressed to compressed file size,align=center]
+f3.input:: A prebuilt https://ccb.jhu.edu/software/centrifuge/[Centrifuge] index file
 
+Tests were run using AWS Batch, with one or four threads per process.
+For all programs, default parameters were used except for compression level and threads, which were set as indicated below.
 
-== Decompression speed
+=== Software versions
 
+[%header,cols="2*^",format=tsv]
+|===
+include::versions.tsv[]
+|===
 
-.Elapsed walltime when decompressing to /dev/null, as a ratio to the fastest time
-image::figure/fig_to_null-1.png[Elapsed walltime when decompressing to /dev/null, as a ratio to the fastest time,align=center]
-
-
-
-.Elapsed walltime when decompressing to disk, as a ratio to the fastest time
-image::figure/fig_to_disk-1.png[Elapsed walltime when decompressing to disk, as a ratio to the fastest time,align=center]
+== Results
 
 
-== Memory usage
+=== Compression ratio
 
 
-.Maximum memory utililized (MB)
-image::figure/fig_mem-1.png[Maximum memory utililized (MB),align=center]
+.Compressed/uncompressed file size ratio relative to best ratio (lower is better)
+image::figure/fig_ratios-1.png[Compressed/uncompressed file size ratio relative to best ratio (lower is better),align=center]
 
 
-== CPU usage
+=== (De)compression speed
 
 
-.Average CPU utilization (%)
-image::figure/fig_cpu-1.png[Average CPU utilization (%),align=center]
+.Compression walltime relative to fastest time (lower is better)
+image::figure/fig_ctime-1.png[Compression walltime relative to fastest time (lower is better),align=center]
+
+
+
+.Decompression walltime relative to fastest time (lower is better)
+image::figure/fig_dtime-1.png[Decompression walltime relative to fastest time (lower is better),align=center]
+
+
+=== Memory usage
+
+
+.Compression maximum resident memory relative to smallest value (lower is better)
+image::figure/fig_cmem-1.png[Compression maximum resident memory relative to smallest value (lower is better),align=center]
+
+
+
+.Decompression maximum resident memory relative to smallest value (lower is better)
+image::figure/fig_dmem-1.png[Decompression maximum resident memory relative to smallest value (lower is better),align=center]
+
+
+=== CPU usage
+
+
+.Compression average CPU utilization
+image::figure/fig_ccpu-1.png[Compression average CPU utilization,align=center]
+
+
+
+.Decompression average CPU utilization
+image::figure/fig_dcpu-1.png[Decompression average CPU utilization,align=center]
 

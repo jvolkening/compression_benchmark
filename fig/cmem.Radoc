@@ -1,0 +1,19 @@
+//begin.rcode fig_cmem, cache=FALSE, include=TRUE, echo=FALSE, warning=FALSE, error=FALSE, results="hide", fig.height=5, fig.width=7, dev=c("png","cairo_pdf"), dev.args=list(cairo_pdf=list(pointsize=10)), dpi=120, background=NA, fig.cap="Compression maximum resident memory relative to smallest value (lower is better)", fig.align="center"
+
+library(ggplot2)
+
+r <- read.delim("../res.tsv")
+s <- r[,c('file','config','c_mem')]
+colnames(s) <- c("file","config","val")
+for (f in unique(s$file)) {
+s$val[s$file == f] <- s$val[s$file == f]/min(s$val[s$file == f])
+}
+
+p <- ggplot(s,aes(fill=file,y=val,x=config)) +
+geom_bar(position="dodge",stat="identity",width=0.6) +
+coord_flip() +
+scale_fill_brewer(palette="Dark2") +
+scale_x_discrete(limits=rev(unique(sort(s$config))))
+p + theme_light() + xlab("program, level, threads") + ylab("relative maximum RAM")
+
+//end.rcode
