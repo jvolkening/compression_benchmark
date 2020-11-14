@@ -4,9 +4,14 @@ channels:
  - conda-forge
  - defaults
 dependencies:
- - xz
- - lz4-c
+ - bbmap
  - lbzip2
+ - libbsc
+ - lz4-c
+ - perl-biox-seq
+ - perl-text-csv
  - pigz
- - zstd
+ - sra-tools
  - time
+ - xz
+ - zstd<=1.3.3

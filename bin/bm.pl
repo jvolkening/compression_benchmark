@@ -7,10 +7,20 @@ use 5.012;
 use File::Basename qw/basename/;
 use File::Copy qw/copy/;
 use File::Temp;
+use Getopt::Long;
+use Text::CSV qw/csv/;
 
-my $fn_in   = $ARGV[0];
-my $dir_tmp = $ARGV[1] // '/tmp';
-my $threads = $ARGV[2] // 8;
+my $fn_in;
+my $fn_cmds;
+my $dir_tmp = '/tmp';
+my $threads = 8;
+
+GetOptions(
+    'in=s'      => \$fn_in,
+    'cmds=s'    => \$fn_cmds,
+    'tmp=s'     => \$dir_tmp,
+    'threads=i' => \$threads,
+);
 
 # read file once into RAM-based storage
 # currently AWS Batch docker /dev/shm too small,
@@ -20,60 +30,18 @@ copy $fn_in, $fn_in_mem;
 #system("cat $fn_in > /dev/null");
 #my $fn_in_mem = $fn_in;
 
-my $cmds = {
-
-    # pigz, single thread
-    "pigz_l9_t1" => "pigz -p 1 -9",
-    "pigz_l1_t1" => "pigz -p 1 -1",
-
-    # pigz, multithread
-    "pigz_l9_t$threads" => "pigz -p $threads -9",
-    "pigz_l1_t$threads" => "pigz -p $threads -1",
-
-    # gzip, single thread
-    "gzip_l9_t1" => "gzip -9",
-    "gzip_l1_t1" => "gzip -1",
-
-    # lz4, single thread
-    "lz4_l9_t1" => "lz4 -9",
-    "lz4_l1_t1" => "lz4 -1",
-
-    # zstd, single thread
-    "zstd_l19_t1" => "zstd -T1 -19",
-    "zstd_l1_t1"  => "zstd -T1 -1",
-
-    # zstd, multithread
-    "zstd_l19_t$threads" => "zstd -T$threads -19",
-    "zstd_l1_t$threads"  => "zstd -T$threads -1",
-
-    # pzstd, single thread
-    "pzstd_l19_t1" => "pzstd -p 1 -19",
-    "pzstd_l1_t1"  => "pzstd -p 1 -1",
-
-    # pzstd, multi thread
-    "pzstd_l19_t$threads" => "pzstd -p $threads -19",
-    "pzstd_l1_t$threads"  => "pzstd -p $threads -1",
-
-    # lbzip2, single thread
-    "lbzip2_l9_t1" => "lbzip2 -n 1 -9",
-    "lbzip2_l1_t1" => "lbzip2 -n 1 -1",
-
-    # lbzip2, multi thread
-    "lbzip2_l9_t$threads" => "lbzip2 -n $threads -9",
-    "lbzip2_l1_t$threads" => "lbzip2 -n $threads -1",
-
-    # xz, single thread
-    "xz_l9_t1" => "xz -T 1 -9",
-    "xz_l1_t1" => "xz -T 1 -1",
-
-    # xz, multi thread
-    "xz_l9_t$threads" => "xz -T $threads -9",
-    "xz_l1_t$threads" => "xz -T $threads -1",
-
-};
+my $cmds = csv(
+    in             => $fn_cmds,
+    headers        => 'auto',
+    sep_char       => "\t",
+    quote_char     => undef,
+    auto_diag      => 1,
+    empty_is_undef => 0,
+);
 
 say join "\t", qw/
     file
+    program
     config
     c_time_mem
     d_time_mem
@@ -84,28 +52,33 @@ say join "\t", qw/
     d_cpu
 /;
 
-for my $conf (keys %$cmds) {
-
-    say STDERR "Running $conf";
+for my $cmd (@{ $cmds }) {
 
     my $tmp_out_mem  = File::Temp->new(DIR => $dir_tmp, UNLINK => 1);
 
     my $time_bin = `which time`;
     chomp $time_bin;
     my $time = "$time_bin -f \"%E\\t%M\\t%P\"";
-    
-    my $comp_cmd_mem  = "$time $cmds->{$conf} -q -k -c $fn_in_mem 2>&1 1> $tmp_out_mem";
+   
+    my $comp_cmd_mem  = "$time $cmd->{command}";
+    $comp_cmd_mem =~ s/TAGS/$cmd->{c_tags}/;
+    $comp_cmd_mem =~ s/IN/$fn_in_mem/;
+    $comp_cmd_mem =~ s/OUT/$tmp_out_mem/;
+    $comp_cmd_mem =~ s/THREADS/$threads/;
 
-    my $decomp_cmd_mem  = "$time $cmds->{$conf} -q -d -c $tmp_out_mem 2>&1 1> /dev/null";
+    my $decomp_cmd_mem  = "$time $cmd->{command}";
+    $decomp_cmd_mem =~ s/TAGS/$cmd->{d_tags}/;
+    $decomp_cmd_mem =~ s/IN/$tmp_out_mem/;
+    $decomp_cmd_mem =~ s/OUT/\/dev\/null/;
+    $decomp_cmd_mem =~ s/THREADS/$threads/;
 
-    say STDERR "\t1";
     my @cmem  = run( $comp_cmd_mem );
-    say STDERR "\t2";
     my @dmem  = run( $decomp_cmd_mem );
 
     say join "\t",
         basename($fn_in),
-        $conf,
+        $cmd->{group},
+        $cmd->{label},
         $cmem[0],
         $dmem[0],
         (-s $tmp_out_mem)/(-s $fn_in),
@@ -122,7 +95,11 @@ unlink $fn_in_mem;
 sub run {
 
     my ($cmd) = @_;
+
     my $ret = `$cmd`;
+    if ($?) {
+        die "$cmd failed: $!\n";
+    }
     chomp $ret;
     my ($time, $mem_kb, $cpu) = split "\t", $ret;
     $cpu =~ s/\%$//;
@@ -133,8 +110,6 @@ sub run {
         if (@units);
     $s += pop(@units)*60*60
         if (@units);
-    #my ($hr, $min, $sec) = ($time =~ /(?:(\d+):)(?:(\d+):)(\d(?:\.\d+))/);
-    #my $e = $sec + $min*60 + $hr*60*60;
     return ($s, $mem_mb, $cpu);
 
 }

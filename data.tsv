@@ -1,0 +1,10 @@
+accession	description	instrument
+SRR9112640	NDV (small viral) genome sequencing	MiSeq
+SRR10040620	Genome of Geobacillus from Antarctic volcano	MiSeq
+ERR2073672	16S amplicon sequencing of A. thaliana microbiome	MiSeq
+SRR8327742	human gut metagenome	HiSeq 4000
+SRR7949668	RNA-Seq of gamma proteobacterium symbiont of Stewartia floridana	HiSeq 4000
+ERR3417415	RNA-Seq of four Bacillus subtilis mutants during sporulation	NextSeq 500
+ERR1810250	WGS of Influenza B virus (B/Djibouti/IP1157/2012)	MiSeq
+DRR014283	WGS of Streptococcus suis	MiSeq
+ERR1885672	RNAseq analysis of microaerobic and aerobic cultures of Pseudomonas extremaustrali	HiSeq 2000

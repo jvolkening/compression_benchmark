@@ -5,42 +5,63 @@ vim: syntax=groovy
 -*- mode: groovy;-*-
 */
 
-params.test_size = 2000000000
 params.threads = 4
 params.out = 'res.tsv'
-
-url_cent  = 'ftp://ftp.ccb.jhu.edu/pub/infphilo/centrifuge/data/p_compressed_2018_4_15.tar.gz'
-url_words = 'https://raw.githubusercontent.com/dwyl/english-words/master/words.txt'
-url_genome = 'ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/vertebrate_mammalian/Mus_musculus/all_assembly_versions/GCF_000001635.26_GRCm38.p6/GCF_000001635.26_GRCm38.p6_genomic.fna.gz'
 
 environment  = Channel.fromPath("${baseDir}/environment.yml")
 docker_tmpfs = '/tmp/scratch'
 environment.into {environment_vers;environment_tests}
+commands  = Channel.fromPath("${baseDir}/cmds.tsv")
 
+// read in table of input sources and split into input channel
+Channel
+    .fromPath("${baseDir}/data.tsv")
+    .splitCsv(header: true, sep: "\t")
+    .set { samples }
 
 process collect_data {
 
+    tag "${row.accession}"
+
+    memory 4.GB 
+
+    input:
+    val row from samples
+
     output:
-    file '*.input' into test_files mode flatten
+    file "${row.accession}.il.fq" into test_files mode flatten
 
     """
-    # word list to generate random input
-    wget -O - $url_words | gen_text.pl ${params.test_size}  > f1.input
-
-    # download FASTQ data from E. coli
-    wget -O - $url_genome | zcat \
-      | head -c ${params.test_size} > f2.input
-
-    # download binary Centrifuge index data
-    wget -O - $url_cent | tar -xzOf - \
-      | head -c ${params.test_size} > f3.input
+    fastq-dump \
+        --gzip \
+        --split-files \
+        --skip-technical \
+        --clip \
+        --dumpbase \
+        --outdir . \
+        ${row.accession}
+    zcat ${row.accession}_1.fastq.gz \
+    	| fq_clean \
+        > cleaned_1.fq
+    zcat ${row.accession}_2.fastq.gz \
+    	| fq_clean \
+        > cleaned_2.fq
+    clumpify.pl \
+        --in cleaned_1.fq \
+        --in2 cleaned_2.fq \
+        --out clumped_1.fq.gz \
+        --out2 clumped_2.fq.gz \
+        --memory 4g
+    fq_interleave \
+        --1 clumped_1.fq.gz \
+        --2 clumped_2.fq.gz \
+        --check \
+    | qbin > ${row.accession}.il.fq
     """
 
 }
 
 process get_versions {
-
-    tag "$input"
 
     publishDir ".", mode: 'copy',
         pattern: "*.tsv"
@@ -52,8 +73,8 @@ process get_versions {
     file "versions.tsv"
 
     """
-    conda env create -n compression -f $env
-    source activate compression
+    #conda env create -n compression -f $env
+    #source activate compression
 
     versions.pl > versions.tsv
     """
@@ -64,23 +85,29 @@ process run_tests {
 
     tag "$input"
     cpus "${params.threads}"
-    memory '8 GB'
+    memory 8.GB
 
     input:
     each file(input) from test_files
     file env from environment_tests
+    file cmds from commands
 
     output:
     file "${input.baseName}.res.tmp" into res_files
 
     """
     mkdir -p $docker_tmpfs
-    mount -t tmpfs -o size=6g tmpfs $docker_tmpfs
+    sudo mount -t tmpfs -o size=6g tmpfs $docker_tmpfs
 
-    conda env create -n compression -f $env
-    source activate compression
+    #conda env create -n compression -f $env
+    #source activate compression
 
-    bm.pl $input $docker_tmpfs ${params.threads} > ${input.baseName}.res.tmp
+    bm.pl \
+        --in $input \
+        --cmds $cmds \
+        --tmp $docker_tmpfs \
+        --threads ${task.cpus} \
+        > ${input.baseName}.res.tmp
     """
 
 }
