@@ -13,11 +13,8 @@ RUN apt-get update && apt-get install -y \
     && conda env create -f environment.yml \
     && rm -rf /opt/conda/pkgs/* && rm -rf /nf
 
-COPY fstab /etc/fstab
-
 # Create regular user
 RUN useradd -m -U nf
-RUN mkdir -p /tmp/scratch && chown -R nf: /tmp/scratch
 USER nf
 WORKDIR /home/nf/
 
