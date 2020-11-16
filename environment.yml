@@ -15,7 +15,7 @@ dependencies:
  - perl-text-csv
  - pigz
  - spring
- - sra-tools
+ - sra-tools==2.9.6
  - time
  - xz
  - zstd<=1.3.3
