@@ -27,6 +27,7 @@ GetOptions(
 # so either need to create separate tmpfs or just read/write to disk
 my $fn_in_mem = join '/', $dir_tmp, basename($fn_in);
 copy $fn_in, $fn_in_mem;
+my $fsize = -s $fn_in_mem;
 #system("cat $fn_in > /dev/null");
 #my $fn_in_mem = $fn_in;
 
@@ -43,6 +44,7 @@ say join "\t", qw/
     file
     program
     config
+    f_size
     c_time_mem
     d_time_mem
     ratio
@@ -79,6 +81,7 @@ for my $cmd (@{ $cmds }) {
         basename($fn_in),
         $cmd->{group},
         $cmd->{label},
+        $fsize,
         $cmem[0],
         $dmem[0],
         (-s $tmp_out_mem)/(-s $fn_in),
