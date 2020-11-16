@@ -9,9 +9,7 @@ params.threads = 4
 params.out = 'res.tsv'
 params.meta_out = 'meta.tsv'
 
-environment  = Channel.fromPath("${baseDir}/environment.yml")
-docker_tmpfs = '/tmp/scratch'
-environment.into {environment_collect;environment_vers;environment_tests}
+docker_tmpfs = '/dev/shm/scratch'
 commands  = Channel.fromPath("${baseDir}/cmds.tsv")
 
 // read in table of input sources and split into input channel
@@ -24,18 +22,14 @@ process collect_data {
 
     tag "${row.accession}"
 
-    memory 4.GB 
+    memory 6.GB 
 
     input:
-    file env from environment_collect
     val row from samples
 
     output:
-    file "${row.accession}.il.fq" into test_files mode flatten
+    file "${row.accession}.il.fq" into test_files
     file "${row.accession}.meta.tmp" into meta_files
-
-    //def envname = String.valueOf((int)(Math.random() * 1000000))
-    //beforeScript "conda init bash && conda env create -n ${envname} -f $env && source activate ${envname}"
 
     script:
     """
@@ -50,20 +44,26 @@ process collect_data {
     zcat ${row.accession}_1.fastq.gz \
     	| fq_clean \
         > cleaned_1.fq
+    unlink ${row.accession}_1.fastq.gz
     zcat ${row.accession}_2.fastq.gz \
     	| fq_clean \
         > cleaned_2.fq
+    unlink ${row.accession}_2.fastq.gz
     clumpify.pl \
         --in cleaned_1.fq \
         --in2 cleaned_2.fq \
         --out clumped_1.fq.gz \
         --out2 clumped_2.fq.gz \
         --memory 4g
+    unlink cleaned_1.fq
+    unlink cleaned_2.fq
     fq_interleave \
         --1 clumped_1.fq.gz \
         --2 clumped_2.fq.gz \
         --check \
     | qbin > ${row.accession}.il.fq
+    unlink clumped_1.fq.gz
+    unlink clumped_2.fq.gz
     seq_stats \
         ${row.accession} \
         < ${row.accession}.il.fq \
@@ -77,14 +77,8 @@ process get_versions {
     publishDir ".", mode: 'copy',
         pattern: "*.tsv"
 
-    input:
-    file env from environment_vers
-
     output:
     file "versions.tsv"
-
-    //def envname = String.valueOf((int)(Math.random() * 1000000))
-    //beforeScript "conda init bash && conda env create -n ${envname} -f $env && source activate ${envname}"
 
     script:
     """
@@ -98,22 +92,18 @@ process run_tests {
     tag "$input"
     cpus "${params.threads}"
     memory { input.size() < 2*Math.pow(1024,3) ? 8.GB : 30.GB }
+    containerOptions "--shm-size 6g"
 
     input:
     each file(input) from test_files
-    file env from environment_tests
     file cmds from commands
 
     output:
     file "${input.baseName}.res.tmp" into res_files
 
-    //def envname = String.valueOf((int)(Math.random() * 1000000))
-    //beforeScript "conda init bash && conda env create -n ${envname} -f $env && source activate ${envname}"
-
     script:
     """
     mkdir -p $docker_tmpfs
-    sudo mount -t tmpfs -o size=6g tmpfs $docker_tmpfs
 
     bm.pl \
         --in $input \
