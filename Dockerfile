@@ -19,7 +19,7 @@ USER nf
 WORKDIR /home/nf/
 
 # activate the conda environment
-ENV PATH /opt/conda/envs/nf/bin:$PATH
+ENV PATH /opt/conda/envs/compression/bin:$PATH
 
 # set entrypoints (both are needed)
 CMD [ "/bin/bash" ]

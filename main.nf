@@ -34,8 +34,8 @@ process collect_data {
     file "${row.accession}.il.fq" into test_files mode flatten
     file "${row.accession}.meta.tmp" into meta_files
 
-    def envname = String.valueOf((int)(Math.random() * 1000000))
-    beforeScript "conda init bash && conda env create -n ${envname} -f $env && source activate ${envname}"
+    //def envname = String.valueOf((int)(Math.random() * 1000000))
+    //beforeScript "conda init bash && conda env create -n ${envname} -f $env && source activate ${envname}"
 
     script:
     """
@@ -83,8 +83,8 @@ process get_versions {
     output:
     file "versions.tsv"
 
-    def envname = String.valueOf((int)(Math.random() * 1000000))
-    beforeScript "conda init bash && conda env create -n ${envname} -f $env && source activate ${envname}"
+    //def envname = String.valueOf((int)(Math.random() * 1000000))
+    //beforeScript "conda init bash && conda env create -n ${envname} -f $env && source activate ${envname}"
 
     script:
     """
@@ -107,8 +107,8 @@ process run_tests {
     output:
     file "${input.baseName}.res.tmp" into res_files
 
-    def envname = String.valueOf((int)(Math.random() * 1000000))
-    beforeScript "conda init bash && conda env create -n ${envname} -f $env && source activate ${envname}"
+    //def envname = String.valueOf((int)(Math.random() * 1000000))
+    //beforeScript "conda init bash && conda env create -n ${envname} -f $env && source activate ${envname}"
 
     script:
     """
