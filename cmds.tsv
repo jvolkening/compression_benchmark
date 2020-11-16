@@ -1,4 +1,16 @@
 group	label	command	c_tags	d_tags
+fqzcomp	fqzcomp_s1_m	fqz_comp TAGS IN OUT 2>&1 > /dev/null	-q 3 -s 1	-d
+fqzcomp	fqzcomp_s1_s	fqz_comp TAGS -P IN OUT 2>&1 > /dev/null	-q 3 -s 1	-d
+fqzcomp	fqzcomp_s3_m	fqz_comp TAGS IN OUT 2>&1 > /dev/null	-q 3 -s 3	-d
+fqzcomp	fqzcomp_s3_2	fqz_comp TAGS -P IN OUT 2>&1 > /dev/null	-q 3 -s 3	-d
+fqzcomp	fqzcomp_s8_m	fqz_comp TAGS IN OUT 2>&1 > /dev/null	-q 3 -s 8	-d
+fqzcomp	fqzcomp_s8_s	fqz_comp TAGS -P IN OUT 2>&1 > /dev/null	-q 3 -s 8	-d
+dsrc	dsrc_m0_s	dsrc TAGS -m1 -t1 IN OUT 2>&1 > /dev/null	c	d
+dsrc	dsrc_m0_m	dsrc TAGS -m1 -tTHREADS IN OUT 2>&1 > /dev/null	c	d
+dsrc	dsrc_m2_s	dsrc TAGS -m2 -t1 IN OUT 2>&1 > /dev/null	c	d
+dsrc	dsrc_m2_m	dsrc TAGS -m2 -tTHREADS IN OUT 2>&1 > /dev/null	c	d
+spring	spring_s	spring TAGS -t 1 -i IN -o OUT 2>&1 > /dev/null	-c	-d
+spring	spring_m	spring TAGS -t THREADS -i IN -o OUT 2>&1 > /dev/null	-c	-d
 bsc	bsc_b1024_s	bsc TAGS IN OUT -b1024 -T 2>&1 > /dev/null	e	d
 bsc	bsc_b1024_m	bsc TAGS IN OUT -b1024 2>&1 > /dev/null	e	d
 bsc	bsc_b16_s	bsc TAGS IN OUT -b16 -T 2>&1 > /dev/null	e	d

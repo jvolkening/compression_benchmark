@@ -44,10 +44,10 @@ say join "\t", qw/
     file
     program
     config
-    f_size
-    c_time_mem
-    d_time_mem
-    ratio
+    c_size
+    u_size
+    c_time
+    d_time
     c_mem
     d_mem
     c_cpu
@@ -81,10 +81,10 @@ for my $cmd (@{ $cmds }) {
         basename($fn_in),
         $cmd->{group},
         $cmd->{label},
+        (-s $tmp_out_mem),
         $fsize,
         $cmem[0],
         $dmem[0],
-        (-s $tmp_out_mem)/(-s $fn_in),
         $cmem[1],
         $dmem[1],
         $cmem[2],

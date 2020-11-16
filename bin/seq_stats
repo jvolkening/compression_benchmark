@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.012;
+
+use BioX::Seq::Stream;
+
+my $tag = $ARGV[0];
+
+say join "\t", qw/
+    id
+    n_reads
+    n_bases
+/;
+    
+
+my $n_reads;
+my $n_bases;
+my $p = BioX::Seq::Stream->new();
+while (my $seq = $p->next_seq) {
+    ++$n_reads;
+    $n_bases += length $seq;
+}
+say join "\t",
+    $tag,
+    $n_reads,
+    $n_bases,
+;

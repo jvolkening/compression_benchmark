@@ -17,7 +17,9 @@ for my $bin (qw/
     pzstd
     zstd
     xz
+    dsrc
     bsc
+    fqz_comp
 /) {
     my $res = `$bin --version 2>&1`;
     if ($res =~ /(\d+\.([\d\.]+)?\d)/) {

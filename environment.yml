@@ -4,13 +4,17 @@ channels:
  - conda-forge
  - defaults
 dependencies:
+ - awscli
  - bbmap
+ - dsrc
+ - fqzcomp
  - lbzip2
  - libbsc
  - lz4-c
  - perl-biox-seq
  - perl-text-csv
  - pigz
+ - spring
  - sra-tools
  - time
  - xz

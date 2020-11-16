@@ -7,10 +7,11 @@ vim: syntax=groovy
 
 params.threads = 4
 params.out = 'res.tsv'
+params.meta_out = 'meta.tsv'
 
 environment  = Channel.fromPath("${baseDir}/environment.yml")
 docker_tmpfs = '/tmp/scratch'
-environment.into {environment_vers;environment_tests}
+environment.into {environment_collect;environment_vers;environment_tests}
 commands  = Channel.fromPath("${baseDir}/cmds.tsv")
 
 // read in table of input sources and split into input channel
@@ -26,11 +27,17 @@ process collect_data {
     memory 4.GB 
 
     input:
+    file env from environment_collect
     val row from samples
 
     output:
     file "${row.accession}.il.fq" into test_files mode flatten
+    file "${row.accession}.meta.tmp" into meta_files
 
+    def envname = String.valueOf((int)(Math.random() * 1000000))
+    beforeScript "conda init bash && conda env create -n ${envname} -f $env && source activate ${envname}"
+
+    script:
     """
     fastq-dump \
         --gzip \
@@ -57,6 +64,10 @@ process collect_data {
         --2 clumped_2.fq.gz \
         --check \
     | qbin > ${row.accession}.il.fq
+    seq_stats \
+        ${row.accession} \
+        < ${row.accession}.il.fq \
+        > ${row.accession}.meta.tmp
     """
 
 }
@@ -72,10 +83,11 @@ process get_versions {
     output:
     file "versions.tsv"
 
-    """
-    #conda env create -n compression -f $env
-    #source activate compression
+    def envname = String.valueOf((int)(Math.random() * 1000000))
+    beforeScript "conda init bash && conda env create -n ${envname} -f $env && source activate ${envname}"
 
+    script:
+    """
     versions.pl > versions.tsv
     """
 
@@ -85,7 +97,7 @@ process run_tests {
 
     tag "$input"
     cpus "${params.threads}"
-    memory 8.GB
+    memory { input.size() < 2*Math.pow(1024,3) ? 8.GB : 30.GB }
 
     input:
     each file(input) from test_files
@@ -95,12 +107,13 @@ process run_tests {
     output:
     file "${input.baseName}.res.tmp" into res_files
 
+    def envname = String.valueOf((int)(Math.random() * 1000000))
+    beforeScript "conda init bash && conda env create -n ${envname} -f $env && source activate ${envname}"
+
+    script:
     """
     mkdir -p $docker_tmpfs
     sudo mount -t tmpfs -o size=6g tmpfs $docker_tmpfs
-
-    #conda env create -n compression -f $env
-    #source activate compression
 
     bm.pl \
         --in $input \
@@ -114,6 +127,11 @@ process run_tests {
 
 res_files.collectFile(
     name: params.out,
+    storeDir: '.',
+    keepHeader: true
+)
+meta_files.collectFile(
+    name: params.meta_out,
     storeDir: '.',
     keepHeader: true
 )
