@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use 5.012;
 
+use Digest::MD5;
 use File::Basename qw/basename/;
 use File::Copy qw/copy/;
 use File::Temp;
@@ -28,8 +29,13 @@ GetOptions(
 my $fn_in_mem = join '/', $dir_tmp, basename($fn_in);
 copy $fn_in, $fn_in_mem;
 my $fsize = -s $fn_in_mem;
-#system("cat $fn_in > /dev/null");
-#my $fn_in_mem = $fn_in;
+
+# get input MD5
+my $hasher = Digest::MD5->new;
+open my $tmp, '<:raw', $fn_in_mem;
+$hasher->addfile($tmp);
+close $tmp;
+my $md5_orig = $hasher->hexdigest;
 
 my $cmds = csv(
     in             => $fn_cmds,
@@ -52,11 +58,13 @@ say join "\t", qw/
     d_mem
     c_cpu
     d_cpu
+    is_lossless
 /;
 
 for my $cmd (@{ $cmds }) {
 
     my $tmp_out_mem  = File::Temp->new(DIR => $dir_tmp, UNLINK => 1);
+    my $tmp_uout_mem  = File::Temp->new(DIR => $dir_tmp, UNLINK => 1);
 
     my $time_bin = `which time`;
     chomp $time_bin;
@@ -71,11 +79,20 @@ for my $cmd (@{ $cmds }) {
     my $decomp_cmd_mem  = "$time $cmd->{command}";
     $decomp_cmd_mem =~ s/TAGS/$cmd->{d_tags}/;
     $decomp_cmd_mem =~ s/IN/$tmp_out_mem/;
-    $decomp_cmd_mem =~ s/OUT/\/dev\/null/;
+    #$decomp_cmd_mem =~ s/OUT/\/dev\/null/;
+    $decomp_cmd_mem =~ s/OUT/$tmp_uout_mem/;
     $decomp_cmd_mem =~ s/THREADS/$threads/;
 
     my @cmem  = run( $comp_cmd_mem );
     my @dmem  = run( $decomp_cmd_mem );
+
+    # get output MD5
+    my $hasher = Digest::MD5->new;
+    open my $tmp, '<:raw', $tmp_uout_mem;
+    $hasher->addfile($tmp);
+    close $tmp;
+    my $md5_out = $hasher->hexdigest;
+    my $lossless = $md5_out eq $md5_orig ? 1 : 0;
 
     say join "\t",
         basename($fn_in),
@@ -89,6 +106,7 @@ for my $cmd (@{ $cmds }) {
         $dmem[1],
         $cmem[2],
         $dmem[2],
+	$lossless,
     ;
 
 } 

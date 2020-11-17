@@ -45,24 +45,18 @@ process collect_data {
         --skip-technical \
         --clip \
         --dumpbase \
+        --origfmt \
+        --defline-qual '+' \
         --outdir . \
         ${row.accession}
-    zcat ${row.accession}_1.fastq.gz \
-    	| fq_clean \
-        > cleaned_1.fq
-    unlink ${row.accession}_1.fastq.gz
-    zcat ${row.accession}_2.fastq.gz \
-    	| fq_clean \
-        > cleaned_2.fq
-    unlink ${row.accession}_2.fastq.gz
     clumpify.pl \
-        --in cleaned_1.fq \
-        --in2 cleaned_2.fq \
+        --in ${row.accession}_1.fastq.gz \
+        --in2 ${row.accession}_2.fastq.gz \
         --out clumped_1.fq.gz \
         --out2 clumped_2.fq.gz \
         --memory 4g
-    unlink cleaned_1.fq
-    unlink cleaned_2.fq
+    unlink ${row.accession}_1.fastq.gz
+    unlink ${row.accession}_2.fastq.gz
     fq_interleave \
         --1 clumped_1.fq.gz \
         --2 clumped_2.fq.gz \
@@ -97,9 +91,8 @@ process run_tests {
 
     tag "$input"
     cpus "${params.threads}"
-    memory { input.size() < 2*Math.pow(1024,3) ? 8.GB : 30.GB }
-    containerOptions "--shm-size 6g"
-    cache false
+    memory { input.size() < 2*Math.pow(1024,3) ? 7.GB : 30.GB }
+    containerOptions "--shm-size 5g"
 
     input:
     each file(input) from test_files
