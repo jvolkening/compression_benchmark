@@ -10,13 +10,19 @@ params.out = 'res.tsv'
 params.meta_out = 'meta.tsv'
 
 docker_tmpfs = '/dev/shm/scratch'
-commands  = Channel.fromPath("${baseDir}/cmds.tsv")
+//commands  = Channel.fromPath("${baseDir}/cmds.tsv")
 
 // read in table of input sources and split into input channel
 Channel
     .fromPath("${baseDir}/data.tsv")
     .splitCsv(header: true, sep: "\t")
     .set { samples }
+
+// read in table of commands and split into input channel
+Channel
+    .fromPath("${baseDir}/cmds.tsv")
+    .splitText(keepHeader: true, file: true)
+    .set { commands }
 
 process collect_data {
 
@@ -97,7 +103,7 @@ process run_tests {
 
     input:
     each file(input) from test_files
-    file cmds from commands
+    each file(cmds) from commands
 
     output:
     file "${input.baseName}.res.tmp" into res_files

@@ -1,43 +1,45 @@
 group	label	command	c_tags	d_tags
-fqzcomp	fqzcomp_s1_m	fqz_comp TAGS IN OUT 2>&1 > /dev/null	-q 3 -s 1	-d
-fqzcomp	fqzcomp_s1_s	fqz_comp TAGS -P IN OUT 2>&1 > /dev/null	-q 3 -s 1	-d
-fqzcomp	fqzcomp_s3_m	fqz_comp TAGS IN OUT 2>&1 > /dev/null	-q 3 -s 3	-d
-fqzcomp	fqzcomp_s3_2	fqz_comp TAGS -P IN OUT 2>&1 > /dev/null	-q 3 -s 3	-d
-fqzcomp	fqzcomp_s8_m	fqz_comp TAGS IN OUT 2>&1 > /dev/null	-q 3 -s 8	-d
-fqzcomp	fqzcomp_s8_s	fqz_comp TAGS -P IN OUT 2>&1 > /dev/null	-q 3 -s 8	-d
-dsrc	dsrc_m0_s	dsrc TAGS -m1 -t1 IN OUT 2>&1 > /dev/null	c	d
-dsrc	dsrc_m0_m	dsrc TAGS -m1 -tTHREADS IN OUT 2>&1 > /dev/null	c	d
-dsrc	dsrc_m2_s	dsrc TAGS -m2 -t1 IN OUT 2>&1 > /dev/null	c	d
-dsrc	dsrc_m2_m	dsrc TAGS -m2 -tTHREADS IN OUT 2>&1 > /dev/null	c	d
-spring	spring_s	spring TAGS -t 1 -i IN -o OUT 2>&1 > /dev/null	-c	-d
-spring	spring_m	spring TAGS -t THREADS -i IN -o OUT 2>&1 > /dev/null	-c	-d
-bsc	bsc_b1024_s	bsc TAGS IN OUT -b1024 -T 2>&1 > /dev/null	e	d
-bsc	bsc_b1024_m	bsc TAGS IN OUT -b1024 2>&1 > /dev/null	e	d
-bsc	bsc_b16_s	bsc TAGS IN OUT -b16 -T 2>&1 > /dev/null	e	d
-bsc	bsc_b16_m	bsc TAGS IN OUT -b16 2>&1 > /dev/null	e	d
-bsc	bsc_b1_s	bsc TAGS IN OUT -b1 -T 2>&1 > /dev/null	e	d
-bsc	bsc_b1_m	bsc TAGS IN OUT -b1 2>&1 > /dev/null	e	d
-gzip	gzip_l1_s	gzip TAGS -1 -q -c IN 2>&1 > OUT		-d
-gzip	gzip_l9_s	gzip TAGS -9 -q -c IN 2>&1 > OUT		-d
-lbzip2	lbzip2_l1_s	lbzip2 TAGS -n 1 -1 -q -c IN 2>&1 > OUT		-d
-lbzip2	lbzip2_l1_m	lbzip2 TAGS -n THREADS -1 -q -c IN 2>&1 > OUT		-d
-lbzip2	lbzip2_l9_s	lbzip2 TAGS -n 1 -9 -q -c IN 2>&1 > OUT		-d
-lbzip2	lbzip2_l9_m	lbzip2 TAGS -n THREADS -9 -q -c IN 2>&1 > OUT		-d
-lz4	lz4_l1_s	lz4 TAGS -1 -q -c IN 2>&1 > OUT		-d
-lz4	lz4_l9_s	lz4 TAGS -9 -q -c IN 2>&1 > OUT		-d
-pigz	pigz_l1_s	pigz TAGS -p 1 -1 -q -c IN 2>&1 > OUT		-d
-pigz	pigz_l1_m	pigz TAGS -p THREADS -1 -q -c IN 2>&1 > OUT		-d
-pigz	pigz_l9_s	pigz TAGS -p 1 -9 -q -c IN 2>&1 > OUT		-d
-pigz	pigz_l9_m	pigz TAGS -p THREADS -9 -q -c IN 2>&1 > OUT		-d
-pzstd	pzstd_l19_s	pzstd TAGS -p 1 -19 -q -c IN 2>&1 > OUT		-d
-pzstd	pzstd_l19_m	pzstd TAGS -p THREADS -19 -q -c IN 2>&1 > OUT		-d
-pzstd	pzstd_l1_s	pzstd TAGS -p 1 -1 -q -c IN 2>&1 > OUT		-d
-pzstd	pzstd_l1_m	pzstd TAGS -p THREADS -1 -q -c IN 2>&1 > OUT		-d
-xz	xz_l1_s	xz TAGS -T 1 -1 -q -c IN 2>&1 > OUT		-d
-xz	xz_l1_m	xz TAGS -T THREADS -1 -q -c IN 2>&1 > OUT		-d
-xz	xz_l9_s	xz TAGS -T 1 -9 -q -c IN 2>&1 > OUT		-d
-xz	xz_l9_m	xz TAGS -T THREADS -9 -q -c IN 2>&1 > OUT		-d
-zstd	zstd_l19_s	zstd TAGS -T1 -19 -q -c IN 2>&1 > OUT		-d
-zstd	zstd_l19_m	zstd TAGS -TTHREADS -19 -q -c IN 2>&1 > OUT		-d
-zstd	zstd_l1_s	zstd TAGS -T1 -1 -q -c IN 2>&1 > OUT		-d
-zstd	zstd_l1_m	zstd TAGS -TTHREADS -1 -q -c IN 2>&1 > OUT		-d
+quip	quip	quip TAGS -c IN 3>&1 > OUT	-i fastq -o quip	-d -i quip -o fastq
+quip	quip_a	quip TAGS -c IN 3>&1 > OUT	-a -i fastq -o quip	-d -i quip -o fastq
+fqzcomp	fqzcomp_s1_m	fqz_comp TAGS IN OUT 3>&1 > /dev/null 2>&1	-q 3 -s 1	-d
+fqzcomp	fqzcomp_s1_s	fqz_comp TAGS -P IN OUT 3>&1 > /dev/null 2>&1	-q 3 -s 1	-d
+fqzcomp	fqzcomp_s3_m	fqz_comp TAGS IN OUT 3>&1 > /dev/null 2>&1	-q 3 -s 3	-d
+fqzcomp	fqzcomp_s3_2	fqz_comp TAGS -P IN OUT 3>&1 > /dev/null 2>&1	-q 3 -s 3	-d
+fqzcomp	fqzcomp_s8_m	fqz_comp TAGS IN OUT 3>&1 > /dev/null 2>&1	-q 3 -s 8	-d
+fqzcomp	fqzcomp_s8_s	fqz_comp TAGS -P IN OUT 3>&1 > /dev/null 2>&1	-q 3 -s 8	-d
+dsrc	dsrc_m0_s	dsrc TAGS -m1 -t1 IN OUT 3>&1 > /dev/null 2>&1	c	d
+dsrc	dsrc_m0_m	dsrc TAGS -m1 -tTHREADS IN OUT 3>&1 > /dev/null 2>&1	c	d
+dsrc	dsrc_m2_s	dsrc TAGS -m2 -t1 IN OUT 3>&1 > /dev/null 2>&1	c	d
+dsrc	dsrc_m2_m	dsrc TAGS -m2 -tTHREADS IN OUT 3>&1 > /dev/null 2>&1	c	d
+spring	spring_s	spring TAGS -t 1 -i IN -o OUT 3>&1 > /dev/null 2>&1	-c	-d
+spring	spring_m	spring TAGS -t THREADS -i IN -o OUT 3>&1 > /dev/null 2>&1	-c	-d
+bsc	bsc_b1024_s	bsc TAGS IN OUT -b1024 -T 3>&1 > /dev/null 2>&1	e	d
+bsc	bsc_b1024_m	bsc TAGS IN OUT -b1024 3>&1 > /dev/null 2>&1	e	d
+bsc	bsc_b16_s	bsc TAGS IN OUT -b16 -T 3>&1 > /dev/null 2>&1	e	d
+bsc	bsc_b16_m	bsc TAGS IN OUT -b16 3>&1 > /dev/null 2>&1	e	d
+bsc	bsc_b1_s	bsc TAGS IN OUT -b1 -T 3>&1 > /dev/null 2>&1	e	d
+bsc	bsc_b1_m	bsc TAGS IN OUT -b1 3>&1 > /dev/null 2>&1	e	d
+gzip	gzip_l1_s	gzip TAGS -1 -q -c IN 3>&1 > OUT		-d
+gzip	gzip_l9_s	gzip TAGS -9 -q -c IN 3>&1 > OUT		-d
+lbzip2	lbzip2_l1_s	lbzip2 TAGS -n 1 -1 -q -c IN 3>&1 > OUT		-d
+lbzip2	lbzip2_l1_m	lbzip2 TAGS -n THREADS -1 -q -c IN 3>&1 > OUT		-d
+lbzip2	lbzip2_l9_s	lbzip2 TAGS -n 1 -9 -q -c IN 3>&1 > OUT		-d
+lbzip2	lbzip2_l9_m	lbzip2 TAGS -n THREADS -9 -q -c IN 3>&1 > OUT		-d
+lz4	lz4_l1_s	lz4 TAGS -1 -q -c IN 3>&1 > OUT		-d
+lz4	lz4_l9_s	lz4 TAGS -9 -q -c IN 3>&1 > OUT		-d
+pigz	pigz_l1_s	pigz TAGS -p 1 -1 -q -c IN 3>&1 > OUT		-d
+pigz	pigz_l1_m	pigz TAGS -p THREADS -1 -q -c IN 3>&1 > OUT		-d
+pigz	pigz_l9_s	pigz TAGS -p 1 -9 -q -c IN 3>&1 > OUT		-d
+pigz	pigz_l9_m	pigz TAGS -p THREADS -9 -q -c IN 3>&1 > OUT		-d
+pzstd	pzstd_l19_s	pzstd TAGS -p 1 -19 -q -c IN 3>&1 > OUT		-d
+pzstd	pzstd_l19_m	pzstd TAGS -p THREADS -19 -q -c IN 3>&1 > OUT		-d
+pzstd	pzstd_l1_s	pzstd TAGS -p 1 -1 -q -c IN 3>&1 > OUT		-d
+pzstd	pzstd_l1_m	pzstd TAGS -p THREADS -1 -q -c IN 3>&1 > OUT		-d
+xz	xz_l1_s	xz TAGS -T 1 -1 -q -c IN 3>&1 > OUT		-d
+xz	xz_l1_m	xz TAGS -T THREADS -1 -q -c IN 3>&1 > OUT		-d
+xz	xz_l9_s	xz TAGS -T 1 -9 -q -c IN 3>&1 > OUT		-d
+xz	xz_l9_m	xz TAGS -T THREADS -9 -q -c IN 3>&1 > OUT		-d
+zstd	zstd_l19_s	zstd TAGS -T1 -19 -q -c IN 3>&1 > OUT		-d
+zstd	zstd_l19_m	zstd TAGS -TTHREADS -19 -q -c IN 3>&1 > OUT		-d
+zstd	zstd_l1_s	zstd TAGS -T1 -1 -q -c IN 3>&1 > OUT		-d
+zstd	zstd_l1_m	zstd TAGS -TTHREADS -1 -q -c IN 3>&1 > OUT		-d
