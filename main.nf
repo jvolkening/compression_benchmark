@@ -93,6 +93,7 @@ process run_tests {
     cpus "${params.threads}"
     memory { input.size() < 2*Math.pow(1024,3) ? 8.GB : 30.GB }
     containerOptions "--shm-size 6g"
+    cache false
 
     input:
     each file(input) from test_files
@@ -118,7 +119,8 @@ process run_tests {
 res_files.collectFile(
     name: params.out,
     storeDir: '.',
-    keepHeader: true
+    keepHeader: true,
+    sort: false
 )
 meta_files.collectFile(
     name: params.meta_out,

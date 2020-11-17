@@ -60,7 +60,7 @@ for my $cmd (@{ $cmds }) {
 
     my $time_bin = `which time`;
     chomp $time_bin;
-    my $time = "$time_bin -f \"%E\\t%M\\t%P\"";
+    my $time = "$time_bin -o /dev/fd/3 -f \"%E\\t%M\\t%P\"";
    
     my $comp_cmd_mem  = "$time $cmd->{command}";
     $comp_cmd_mem =~ s/TAGS/$cmd->{c_tags}/;
