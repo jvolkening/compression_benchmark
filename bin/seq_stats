@@ -7,13 +7,25 @@ use 5.012;
 use BioX::Seq::Stream;
 
 my $tag = $ARGV[0];
+my $fn_k = $ARGV[1];
 
 say join "\t", qw/
     id
     n_reads
     n_bases
+    kmers
 /;
-    
+
+# parse BBmap kmer file
+open my $in, '<', $fn_k;
+my $h = <$in>;
+my $n_kmers = 0;
+while (my $line = <$in>) {
+    chomp $line;
+    my ($depth, $count, $log) = split "\t", $line;
+    $n_kmers += $count;
+}
+close $in;
 
 my $n_reads;
 my $n_bases;
@@ -26,4 +38,5 @@ say join "\t",
     $tag,
     $n_reads,
     $n_bases,
+    $n_kmers,
 ;

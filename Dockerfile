@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
       autoconf \
       automake \
       build-essential \
+      plzip \
       procps \
       vim \
       zlib1g-dev \

@@ -64,8 +64,14 @@ process collect_data {
     | qbin > ${row.accession}.il.fq
     unlink clumped_1.fq.gz
     unlink clumped_2.fq.gz
+    kmercountexact.sh \
+        -Xmx 4g \
+        in=${row.accession}.il.fq \
+        qin=33 \
+        khist=k.hist
     seq_stats \
         ${row.accession} \
+        k.hist \
         < ${row.accession}.il.fq \
         > ${row.accession}.meta.tmp
     """
