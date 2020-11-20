@@ -9,12 +9,14 @@ r$file <- str_replace(r$file, '\\..+', '')
 r$ratio <- r$u_size/r$c_size
 r$space_saving <- 1- r$c_size/r$u_size
 r <- r %>% filter(!str_detect(config, "_m$"))
-r$config <- reorder(r$config, -r$ratio, FUN=sum)
+r$config <- reorder(r$config, -r$ratio, FUN=median)
 
 r %>%
-    ggplot(aes(color=program, x=config, y=ratio, group=file)) +
-    geom_line() +
-    geom_point(cex=3, stat="identity") +
+    ggplot(aes(fill=program, x=config, y=ratio)) +
+    #geom_line() +
+    #geom_point(cex=3, stat="identity") +
+    geom_violin(width=0.8, scale="width") +
+    geom_boxplot(width=0.4, fill="white", alpha=0.5) +
     coord_flip() +
     #scale_shape_manual(values=seq(0,length(unique(r$program))-1)) +
     #scale_colour_manual(values=rep(brewer.pal(5,"Set1"),times=9)) +

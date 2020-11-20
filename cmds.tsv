@@ -47,3 +47,5 @@ zstd	zstd_l19_s	zstd TAGS -T1 -19 -q -c IN 3>&1 > OUT		-d
 zstd	zstd_l19_m	zstd TAGS -TTHREADS -19 -q -c IN 3>&1 > OUT		-d
 zstd	zstd_l1_s	zstd TAGS -T1 -1 -q -c IN 3>&1 > OUT		-d
 zstd	zstd_l1_m	zstd TAGS -TTHREADS -1 -q -c IN 3>&1 > OUT		-d
+naf	naf_1	TAGS -c IN 3>&1 > OUT	ennaf -1 --temp-dir /tmp	unnaf
+naf	naf_22	TAGS -c IN 3>&1 > OUT	ennaf -22 --temp-dir /tmp	unnaf
