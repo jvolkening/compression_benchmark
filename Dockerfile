@@ -22,6 +22,12 @@ RUN apt-get update && apt-get install -y \
     && autoreconf -i \
     && ./configure \
     && make install \
+    # install NAF from GitHub
+    && git clone --recurse-submodules https://github.com/KirillKryukov/naf.git \
+    && cd naf \
+    && make \
+    && make test \
+    && make install \
     # final cleanup
     && rm -rf /opt/conda/pkgs/* && rm -rf /nf
 
