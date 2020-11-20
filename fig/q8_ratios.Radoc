@@ -1,0 +1,31 @@
+//begin.rcode fig_ratios_q8, cache=FALSE, message=F, include=TRUE, echo=FALSE, warning=FALSE, error=FALSE, results="hide", fig.height=8, fig.width=11, dev='svg', dev.args=list(svg=list(pointsize=10)), dpi=180, background=NA, fig.cap="Ratio of compressed files with Q8 binning (unbinned:binned, higher is better)", fig.align="center"
+
+
+library(tidyverse)
+library(plotly)
+
+r <- read_tsv('../res.q8.tsv');
+
+r$is_q8 <- str_detect(r$file, '_q8\\.il')
+r$file <- str_replace(r$file, '_q8\\.il','.il')
+r <- r %>%
+    group_by(file, config) %>%
+    summarise(
+        ratio=c_size[!is_q8]/c_size[is_q8]
+    )
+r$file <- str_replace(r$file, '\\..+', '')
+r$file <- paste0('run',as.numeric(as_factor(r$file)))
+r$config <- reorder(r$config, -r$ratio, FUN=sum)
+
+r %>%
+    ggplot(aes(color=file, x=config, y=ratio, group=file)) +
+    geom_line() +
+    geom_point(cex=3, stat="identity") +
+    coord_flip() +
+    #scale_shape_manual(values=seq(0,length(unique(r$program))-1)) +
+    #scale_colour_manual(values=rep(brewer.pal(5,"Set1"),times=9)) +
+    scale_x_discrete(limits=rev(unique(sort(r$config)))) +
+    theme_light() +
+    xlab("configuration") +
+    ylab("ratio unbinned:binned")
+//end.rcode

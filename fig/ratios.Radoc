@@ -1,19 +1,25 @@
-//begin.rcode fig_ratios, cache=FALSE, include=TRUE, echo=FALSE, warning=FALSE, error=FALSE, results="hide", fig.height=5, fig.width=7, dev=c("png","cairo_pdf"), dev.args=list(cairo_pdf=list(pointsize=10)), dpi=120, background=NA, fig.cap="Compressed/uncompressed file size ratio relative to best ratio (lower is better)", fig.align="center"
+//begin.rcode fig_ratios, cache=FALSE, message=F, include=TRUE, echo=FALSE, warning=FALSE, error=FALSE, results="hide", fig.height=8, fig.width=11, dev='svg', dev.args=list(svg=list(pointsize=10)), dpi=180, background=NA, fig.cap="Compression ratio (higher is better)", fig.align="center"
 
-library(ggplot2)
 
-r <- read.delim("../res.tsv")
-s <- r[,c('file','config','ratio')]
-colnames(s) <- c("file","config","val")
-for (f in unique(s$file)) {
-s$val[s$file == f] <- s$val[s$file == f]/min(s$val[s$file == f])
-}
+library(tidyverse)
+library(plotly)
 
-p <- ggplot(s,aes(fill=file,y=val,x=config)) +
-geom_bar(position="dodge",stat="identity",width=0.6) +
-coord_flip() +
-scale_fill_brewer(palette="Dark2") +
-scale_x_discrete(limits=rev(unique(sort(s$config))))
-p + theme_light() + xlab("program, level, threads") + ylab("relative compression ratio")
+r <- read_tsv('../res.tsv');
+r$file <- str_replace(r$file, '\\..+', '')
+r$ratio <- r$u_size/r$c_size
+r$space_saving <- 1- r$c_size/r$u_size
+r <- r %>% filter(!str_detect(config, "_m$"))
+r$config <- reorder(r$config, -r$ratio, FUN=sum)
 
+r %>%
+    ggplot(aes(color=program, x=config, y=ratio, group=file)) +
+    geom_line() +
+    geom_point(cex=3, stat="identity") +
+    coord_flip() +
+    #scale_shape_manual(values=seq(0,length(unique(r$program))-1)) +
+    #scale_colour_manual(values=rep(brewer.pal(5,"Set1"),times=9)) +
+    scale_x_discrete(limits=rev(unique(sort(r$config)))) +
+    theme_light() +
+    xlab("configuration") +
+    ylab("compression ratio")
 //end.rcode

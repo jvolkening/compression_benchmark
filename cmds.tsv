@@ -1,10 +1,14 @@
 group	label	command	c_tags	d_tags
+plzip	plzip_l6_s	plzip TAGS -n 1 -6 -q -c IN 3>&1 > OUT		-d
+plzip	plzip_l6_m	plzip TAGS -n THREADS -6 -q -c IN 3>&1 > OUT		-d
+plzip	plzip_l9_s	plzip TAGS -n 1 -9 -q -c IN 3>&1 > OUT		-d
+plzip	plzip_l9_m	plzip TAGS -n THREADS -9 -q -c IN 3>&1 > OUT		-d
 quip	quip	quip TAGS -c IN 3>&1 > OUT	-i fastq -o quip	-d -i quip -o fastq
 quip	quip_a	quip TAGS -c IN 3>&1 > OUT	-a -i fastq -o quip	-d -i quip -o fastq
 fqzcomp	fqzcomp_s1_m	fqz_comp TAGS IN OUT 3>&1 > /dev/null 2>&1	-q 3 -s 1	-d
 fqzcomp	fqzcomp_s1_s	fqz_comp TAGS -P IN OUT 3>&1 > /dev/null 2>&1	-q 3 -s 1	-d
 fqzcomp	fqzcomp_s3_m	fqz_comp TAGS IN OUT 3>&1 > /dev/null 2>&1	-q 3 -s 3	-d
-fqzcomp	fqzcomp_s3_2	fqz_comp TAGS -P IN OUT 3>&1 > /dev/null 2>&1	-q 3 -s 3	-d
+fqzcomp	fqzcomp_s3_s	fqz_comp TAGS -P IN OUT 3>&1 > /dev/null 2>&1	-q 3 -s 3	-d
 fqzcomp	fqzcomp_s8_m	fqz_comp TAGS IN OUT 3>&1 > /dev/null 2>&1	-q 3 -s 8	-d
 fqzcomp	fqzcomp_s8_s	fqz_comp TAGS -P IN OUT 3>&1 > /dev/null 2>&1	-q 3 -s 8	-d
 dsrc	dsrc_m0_s	dsrc TAGS -m1 -t1 IN OUT 3>&1 > /dev/null 2>&1	c	d

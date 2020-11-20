@@ -10,16 +10,7 @@ We tested a number of popular compression tools to look for one which provided f
 
 == Methods
 
-Three input files were used for testing, each truncated to ~ 2GB in size:
-
-f1.input:: A file of randomly chosen English words
-
-f2.input:: The *Mus musculus* genome
-
-f3.input:: A prebuilt https://ccb.jhu.edu/software/centrifuge/[Centrifuge] index file
-
-Tests were run using AWS Batch, with one or four threads per process.
-For all programs, default parameters were used except for compression level and threads, which were set as indicated below.
+A variety of paired-end Illumina FASTQ datasets were used as input (TODO: finish description).
 
 === Software versions
 
@@ -34,6 +25,8 @@ include::versions.tsv[]
 === Compression ratio
 
 +r knit_child('fig/ratios.Radoc')+
+
++r knit_child('fig/q8_ratios.Radoc')+
 
 === (De)compression speed
 

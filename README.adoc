@@ -34,42 +34,47 @@ include::versions.tsv[]
 === Compression ratio
 
 
-.Compressed/uncompressed file size ratio relative to best ratio (lower is better)
-image::figure/fig_ratios-1.png[Compressed/uncompressed file size ratio relative to best ratio (lower is better),align=center]
+.Compression ratio (higher is better)
+image::figure/fig_ratios-1.svg[Compression ratio (higher is better),align=center]
+
+
+
+.Ratio of compressed files with Q8 binning (unbinned:binned, higher is better)
+image::figure/fig_ratios_q8-1.svg[Ratio of compressed files with Q8 binning (unbinned:binned, higher is better),align=center]
 
 
 === (De)compression speed
 
 
-.Compression walltime relative to fastest time (lower is better)
-image::figure/fig_ctime-1.png[Compression walltime relative to fastest time (lower is better),align=center]
+.Compression rate (MB/s) (higher is better)
+image::figure/fig_ctime-1.svg[Compression rate (MB/s) (higher is better),align=center]
 
 
 
-.Decompression walltime relative to fastest time (lower is better)
-image::figure/fig_dtime-1.png[Decompression walltime relative to fastest time (lower is better),align=center]
+.Decompression rate (MB/s) (higher is better)
+image::figure/fig_dtime-1.svg[Decompression rate (MB/s) (higher is better),align=center]
 
 
 === Memory usage
 
 
 .Compression maximum resident memory
-image::figure/fig_cmem-1.png[Compression maximum resident memory,align=center]
+image::figure/fig_cmem-1.svg[Compression maximum resident memory,align=center]
 
 
 
 .Decompression maximum resident memory
-image::figure/fig_dmem-1.png[Decompression maximum resident memory,align=center]
+image::figure/fig_dmem-1.svg[Decompression maximum resident memory,align=center]
 
 
 === CPU usage
 
 
 .Compression average CPU utilization
-image::figure/fig_ccpu-1.png[Compression average CPU utilization,align=center]
+image::figure/fig_ccpu-1.svg[Compression average CPU utilization,align=center]
 
 
 
 .Decompression average CPU utilization
-image::figure/fig_dcpu-1.png[Decompression average CPU utilization,align=center]
+image::figure/fig_dcpu-1.svg[Decompression average CPU utilization,align=center]
 
